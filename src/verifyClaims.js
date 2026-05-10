@@ -1,9 +1,11 @@
 import { MerkleTree}  from 'merkletreejs';
 import loadBls from "bls-signatures";
-import sha256 from 'crypto-js/sha256.js';
+import { createHash } from "crypto";
 import fs  from 'fs';
 import bulletproofs from '@latticelabs/zkp-js/bulletproof.js'
 import { closestPowerOfTwo, stringToBigInt } from './utils.js';
+import { USE_FALCON } from "./utils.js";
+import { falconVerifyRoot } from "./falconCli.js";
 const CommitmentUtils = bulletproofs.CommitmentUtils;
 const PedGeneratorParams = bulletproofs.PedGeneratorParams;
 const Rand = bulletproofs.Rand;
@@ -14,6 +16,15 @@ const CompressedBulletproof = bulletproofs.CompressedProofs;
 const ProofFactory = bulletproofs.ProofFactory;
 const pedGenParams = PedGeneratorParams.generateParams(library, curveName);
 const PointFn = pedGenParams.PointFn;
+
+
+const sha3_256 = (data) => {
+  const input = Buffer.isBuffer(data)
+    ? data
+    : Buffer.from(String(data));
+
+  return createHash("sha3-256").update(input).digest();
+};
 
 async function verifyClaims(proofsFilePath, rootSignatureFilePath, publicKeyFilePath, requiredClaimsFilePath) {
   // Initialize the BLS library
@@ -29,10 +40,18 @@ async function verifyClaims(proofsFilePath, rootSignatureFilePath, publicKeyFile
   // Read and parse the public key file
   const publicKeyData = JSON.parse(fs.readFileSync(publicKeyFilePath, 'utf8'));
   const publicKeyHex = publicKeyData.publicKey;
-  const publicKey = bls.G1Element.from_bytes(Buffer.from(publicKeyHex,'hex'));
+
+  let blsPublicKey = null;
+
+  if (!USE_FALCON) {
+    blsPublicKey = bls.G1Element.from_bytes(
+      Buffer.from(publicKeyHex, 'hex')
+    );
+  }
+
  
   // Verify each claim
-  const tree = new MerkleTree([], sha256, { sortPairs: true }); // Dummy tree for verification
+  const tree = new MerkleTree([], sha3_256, { sortPairs: true }); // Dummy tree for verification
 
   const isValidClaims =revealedClaims.every(claimGroup => {
     return Object.entries(claimGroup).every(([key, { value, salt, proof, numerical_proof_low,numerical_proof_high, numerical_value_low,numerical_value_high }]) => {
@@ -79,10 +98,24 @@ async function verifyClaims(proofsFilePath, rootSignatureFilePath, publicKeyFile
   });
   });
   // Verify the signature
-  const isValidSignature = bls.AugSchemeMPL.verify(publicKey,
-    merkleRoot,
-    bls.G2Element.from_bytes(Buffer.from(signature, 'hex'))
-  );
+  let isValidSignature;
+
+  if (USE_FALCON) {
+    console.log("▶ Verifying signature with Falcon");
+    const publicKeyHex = publicKeyData.publicKey;
+    isValidSignature = falconVerifyRoot(
+      merkleRoot,
+      signature,
+      publicKeyHex
+    );
+  } else {
+    isValidSignature = bls.AugSchemeMPL.verify(
+      blsPublicKey,
+      merkleRoot,
+      bls.G2Element.from_bytes(Buffer.from(signature, 'hex'))
+    );
+  }
+
 
   console.log(`Claims are valid: ${isValidClaims}`);
   console.log(`Signature is valid: ${isValidSignature}`);

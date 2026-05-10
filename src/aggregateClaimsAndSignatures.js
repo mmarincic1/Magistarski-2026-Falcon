@@ -1,48 +1,82 @@
-import { MerkleTree}  from 'merkletreejs';
+import fs from "fs";
 import loadBls from "bls-signatures";
-import sha256 from 'crypto-js/sha256.js';
-import fs  from 'fs';
-
+import { USE_FALCON } from "./utils.js";
+import { falconAggregateSignatures } from "./falconCli.js";
 
 async function aggregateClaimsAndSignatures(claimsFiles, rootSignatureFiles) {
-  // Initialize the BLS library
-  
-  var bls = await loadBls();
+  const bls = await loadBls();
 
-
-  let aggregatedClaims = [];
-  let signatures = [];
-
-  // Process disclosed claims and proofs
-  claimsFiles.forEach(filePath => {
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    aggregatedClaims.push(data.revealedClaims);
+  // -----------------------------
+  // Load disclosed claims
+  // -----------------------------
+  const aggregatedClaims = claimsFiles.map(fp => {
+    const data = JSON.parse(fs.readFileSync(fp, "utf8"));
+    return data.revealedClaims;
   });
 
-  // Process roots and signatures, and collect signatures for aggregation
-  rootSignatureFiles.forEach(filePath => {
-    const { issuer, signature } = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    signatures.push(signature);
+  // -----------------------------
+  // Load roots & signatures
+  // -----------------------------
+  const roots = rootSignatureFiles.map(fp => {
+    const { merkleRoot } = JSON.parse(fs.readFileSync(fp, "utf8"));
+    return merkleRoot;
   });
 
-  // Convert signatures from hex to Signature objects
-  signatures = signatures.map(sigHex => bls.G2Element.fromBytes(Buffer.from(sigHex, 'hex')));
+  const signatures = rootSignatureFiles.map(fp => {
+    const { signature } = JSON.parse(fs.readFileSync(fp, "utf8"));
+    return signature;
+  });
 
-  // Aggregate the signatures
-  const aggregatedSignature = bls.AugSchemeMPL.aggregate(signatures);
+  // -----------------------------
+  // Check if all roots are same
+  // -----------------------------
+  const allSameRoot = roots.every(r => r === roots[0]);
 
-  // Prepare the output object
-  const output = {
-    aggregatedClaims,
-    aggregatedSignature: Buffer.from(aggregatedSignature.serialize()).toString('hex')
-  };
+  let output;
 
-  // Write the aggregated data to a JSON file
-  const outputFilename = 'aggregatedClaimsAndSignatures.json';
-  fs.writeFileSync(outputFilename, JSON.stringify(output, null, 2), 'utf8');
+  // =============================
+  // FALCON MODE
+  // =============================
+  if (USE_FALCON) {
+      output = {
+        aggregationMode: "none",
+        aggregatedClaims,
+        roots,
+        signatures,
+      };
 
-  console.log(`Aggregated data saved to ${outputFilename}`);
+      console.log("Falcon fallback applied (different roots).");
+    // }
+  }
+
+  // =============================
+  // BLS MODE
+  // =============================
+  else {
+    const sigObjects = signatures.map(sigHex =>
+      bls.G2Element.fromBytes(Buffer.from(sigHex, "hex"))
+    );
+
+    const aggregatedSignature = bls.AugSchemeMPL.aggregate(sigObjects);
+
+    output = {
+      aggregationMode: "bls",
+      aggregatedClaims,
+      aggregatedSignature: Buffer.from(
+        aggregatedSignature.serialize()
+      ).toString("hex"),
+    };
+
+    console.log("BLS aggregation applied.");
+  }
+
+  fs.writeFileSync(
+    "aggregatedClaimsAndSignatures.json",
+    JSON.stringify(output, null, 2),
+    "utf8"
+  );
+
+  console.log("Aggregated presentation saved.");
 }
 
-// Example usage
 export default aggregateClaimsAndSignatures;

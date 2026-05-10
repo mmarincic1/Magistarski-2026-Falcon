@@ -1,0 +1,36 @@
+Mode       Flow       Metric                              File                                          Avg(bytes)  
+------------------------------------------------------------------------------------------------------------------------
+BLS        multiple   aggregated_presentation_size        aggregatedClaimsAndSignatures.json            13667.80    
+BLS        multiple   credential_A_size                   IssuerA_claimsA_issued_credential.json        306.20      
+BLS        multiple   credential_B_size                   IssuerB_claimsB_issued_credential.json        306.20      
+BLS        multiple   private_key_A_size                  IssuerA_privateKey.json                       109.00      
+BLS        multiple   private_key_B_size                  IssuerB_privateKey.json                       109.00      
+BLS        multiple   public_key_A_size                   IssuerA_publicKey.json                        140.00      
+BLS        multiple   public_key_B_size                   IssuerB_publicKey.json                        140.00      
+BLS        multiple   revealed_claims_A_size              revealedClaims_IssuerA_claimsA_issued_credential.json 8105.40     
+BLS        multiple   revealed_claims_B_size              revealedClaims_IssuerB_claimsB_issued_credential.json 5131.40     
+BLS        multiple   signature_A_file_size               IssuerA_claimsA_signature.json                320.00      
+BLS        multiple   signature_B_file_size               IssuerB_claimsB_signature.json                320.00      
+BLS        single     credential_size                     IssuerA_claimsA_issued_credential.json        306.20      
+BLS        single     private_key_size                    IssuerA_privateKey.json                       109.00      
+BLS        single     public_key_size                     IssuerA_publicKey.json                        140.00      
+BLS        single     revealed_claims_size                revealedClaims_IssuerA_claimsA_issued_credential.json 8105.60     
+BLS        single     signature_file_size                 IssuerA_claimsA_signature.json                320.00      
+Falcon     multiple   aggregated_presentation_size        aggregatedClaimsAndSignatures.json            16310.60    
+Falcon     multiple   credential_A_size                   IssuerA_claimsA_issued_credential.json        306.00      
+Falcon     multiple   credential_B_size                   IssuerB_claimsB_issued_credential.json        306.20      
+Falcon     multiple   private_key_A_size                  IssuerA_falcon_privateKey.json                2607.00     
+Falcon     multiple   private_key_B_size                  IssuerB_falcon_privateKey.json                2607.00     
+Falcon     multiple   public_key_A_size                   IssuerA_falcon_publicKey.json                 1838.00     
+Falcon     multiple   public_key_B_size                   IssuerB_falcon_publicKey.json                 1838.00     
+Falcon     multiple   revealed_claims_A_size              revealedClaims_IssuerA_claimsA_issued_credential.json 8105.00     
+Falcon     multiple   revealed_claims_B_size              revealedClaims_IssuerB_claimsB_issued_credential.json 5131.60     
+Falcon     multiple   signature_A_file_size               IssuerA_claimsA_signature.json                1460.00     
+Falcon     multiple   signature_B_file_size               IssuerB_claimsB_signature.json                1460.00     
+Falcon     single     credential_size                     IssuerA_claimsA_issued_credential.json        306.40      
+Falcon     single     private_key_size                    IssuerA_falcon_privateKey.json                2607.00     
+Falcon     single     public_key_size                     IssuerA_falcon_publicKey.json                 1838.00     
+Falcon     single     revealed_claims_size                revealedClaims_IssuerA_claimsA_issued_credential.json 8106.00     
+Falcon     single     signature_file_size                 IssuerA_claimsA_signature.json                1460.00     
+
+Logs saved to: benchmark-results/logs-20260510-195813

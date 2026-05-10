@@ -148,3 +148,425 @@ npm run create-presentation -- --claims revealedClaims_IssuerA_claimsA_issued_cr
 ```
  npm run verify-multiple -- --claims aggregatedClaimsAndSignatures.json --key IssuerA_publicKey.json IssuerB_publicKey.json --root IssuerA_claimsA_signature.json IssuerB_claimsB_signature.json  --required VerifierCIssuerARequiredDisclosures.json VerifierCIssuerBRequiredDisclosures.json
 ```
+
+# Selective Disclosure: BLS-MT-ZKP with Falcon Post-Quantum Signatures
+
+Extended proof-of-concept implementation for selective disclosure of digital credentials using:
+
+- Merkle Trees
+- Post-Quantum Falcon Signatures
+- SHA3-256 hashing
+- Pedersen Commitments
+- Bulletproofs range proofs
+
+The project extends the original BLS-MT-ZKP implementation by introducing a post-quantum signature layer based on Falcon and replacing the Merkle tree hashing algorithm with SHA3-256.
+
+Main focus of the project:
+- selective disclosure of claims,
+- range proofs for numerical values,
+- multiple credential presentations,
+- post-quantum signature support,
+- comparison between original BLS and Falcon-based approaches.
+
+---
+
+# Implemented Extensions
+
+Compared to the original implementation, the following changes were introduced.
+
+## Falcon Post-Quantum Signature Integration
+
+The original BLS signature layer was extended with Falcon-512 signatures.
+
+Implemented functionality:
+- Falcon key generation
+- Falcon signing of Merkle roots
+- Falcon signature verification
+- Batch verification fallback strategy for multiple credentials
+- Dual-mode support (BLS / Falcon)
+
+## SHA3-256 Merkle Hashing
+
+Original SHA-256 hashing used inside Merkle trees was replaced with SHA3-256.
+
+The Pedersen commitment layer was intentionally preserved because:
+- Bulletproof range proofs depend on the current commitment model
+- Full migration to post-quantum ZKP primitives is outside the scope of this implementation
+
+## Aggregation Fallback Strategy
+
+BLS supports native aggregate signatures.
+
+Falcon does not provide equivalent aggregation support in the used implementation.
+
+Because of this:
+- The original BLS aggregation mechanism was preserved for BLS mode
+- Falcon mode uses a fallback strategy based on:
+  - lists of individual signatures
+  - batch verification optimization
+
+This preserves selective disclosure functionality while remaining compatible with Falcon signatures.
+
+---
+
+# Setup
+
+Make sure the following are installed:
+
+- [Node.js](https://nodejs.org/) (LTS recommended)
+- npm
+- Rust + Cargo (required for Falcon CLI)
+
+Clone repository:
+
+```bash
+git clone -b main https://github.com/seilabecirovic/Selective-disclosure-BLS-Merkle-Trees.git
+
+cd Selective-disclosure-BLS-Merkle-Trees
+```
+
+Install Node.js dependencies:
+
+```bash
+npm install
+```
+
+---
+
+# Falcon CLI Setup
+
+The Falcon implementation uses a Rust CLI wrapper.
+
+Build Falcon CLI:
+
+```bash
+cd falcon-rust
+cargo build --release
+```
+
+Return to project root:
+
+```bash
+cd ..
+```
+
+---
+
+# Configuration
+
+The project supports two modes:
+
+- Falcon mode (default)
+- Original BLS mode
+
+Configuration is controlled through:
+
+```js
+export const USE_FALCON =
+  process.env.USE_FALCON !== "false";
+```
+
+## Falcon mode
+
+```bash
+./scripts/run-falcon-flow.sh
+```
+
+## BLS mode
+
+```bash
+USE_FALCON=false ./scripts/run-bls-flow.sh
+```
+
+---
+
+# Usage
+
+## Generate issuer keys
+
+```bash
+npm run generate-keys -- --issuerName <issuerName>
+```
+
+Generates:
+- public key
+- private key
+
+Depending on selected mode:
+- BLS keys
+- Falcon keys
+
+---
+
+## Create Credential and Sign Merkle Root
+
+```bash
+npm run create-credential -- --claims <claims> --key <key>
+```
+
+Creates:
+- credential file
+- Merkle root
+- signature file
+
+---
+
+## Define Required Claims
+
+```bash
+npm run require-claims -- \
+  --name <name> \
+  --disclose <disclose...> \
+  --numerical <numerical...> \
+  --min <min...> \
+  --max <max...>
+```
+
+Creates verifier disclosure requirements.
+
+---
+
+## Create Selective Disclosure Proof
+
+```bash
+npm run disclose-claims -- \
+  --claims <claims> \
+  --disclosed <requirements>
+```
+
+Creates:
+- disclosed claims
+- Merkle proofs
+- Bulletproof range proofs
+
+---
+
+## Verify Disclosed Claims
+
+```bash
+npm run verify-single -- \
+  --proof <proof> \
+  --signature <signature> \
+  --key <key> \
+  --required <required>
+```
+
+Verification includes:
+- Merkle proof verification
+- Bulletproof range proof verification
+- Signature verification
+
+---
+
+## Create Aggregated Presentation
+
+```bash
+npm run create-presentation -- \
+  --claims <claims...> \
+  --roots <roots...>
+```
+
+Creates:
+- aggregated presentation
+- combined disclosed claims
+- signature metadata
+
+In Falcon mode:
+- aggregation uses fallback strategy
+- signatures are stored individually
+
+---
+
+## Verify Aggregated Presentation
+
+```bash
+npm run verify-multiple -- \
+  --claims <claims> \
+  --key <key...> \
+  --root <root...> \
+  --required <required...>
+```
+
+### BLS Mode
+
+Uses:
+- native BLS aggregate signature verification
+
+### Falcon Mode
+
+Uses:
+- batch verification of individual Falcon signatures
+
+This is **NOT** cryptographic aggregation.
+
+It is an optimization that:
+- reduces CLI invocation overhead
+- verifies multiple Falcon signatures in one Rust process execution
+
+---
+
+# Scripts
+
+## Falcon Single Credential Flow
+
+```bash
+./scripts/run-single-flow.sh
+```
+
+Runs:
+- Falcon key generation
+- credential creation
+- selective disclosure
+- single verification
+
+---
+
+## Falcon Multi-Credential Flow
+
+```bash
+./scripts/run-falcon-flow.sh
+```
+
+Runs:
+- multiple credential issuing
+- aggregated presentation creation
+- Falcon batch verification fallback
+
+---
+
+## Original BLS Single Flow
+
+```bash
+./scripts/run-bls-single-flow.sh
+```
+
+Runs original BLS implementation for a single credential.
+
+---
+
+## Original BLS Multi-Credential Flow
+
+```bash
+./scripts/run-bls-flow.sh
+```
+
+Runs original BLS implementation for multiple credentials.
+
+---
+
+# Benchmarking
+
+The project includes detailed benchmarking scripts for comparing:
+- BLS
+- Falcon
+
+implementations.
+
+## Step Benchmark
+
+```bash
+./scripts/benchmark-steps.sh
+```
+
+Or with custom iteration count:
+
+```bash
+./scripts/benchmark-steps.sh 10
+```
+
+The benchmark measures:
+- key generation
+- credential creation and signing
+- selective disclosure generation
+- single verification
+- presentation creation
+- multiple verification
+- file sizes
+- key sizes
+- signature sizes
+
+Generated outputs:
+
+```text
+benchmark-results/
+├── step-benchmark-<timestamp>.csv
+├── summary-<timestamp>.txt
+├── sizes-<timestamp>.txt
+└── logs-<timestamp>/
+```
+
+---
+
+# Security Notes
+
+## BLS
+
+Original implementation:
+- supports native aggregation
+- not post-quantum secure
+
+## Falcon
+
+Extended implementation:
+- post-quantum secure signature layer
+- no native aggregation
+- larger keys and signatures
+
+## SHA3-256
+
+Merkle tree hashing was migrated from SHA-256 to SHA3-256.
+
+## Pedersen Commitments
+
+Pedersen commitments and Bulletproof range proofs remain unchanged from the original implementation.
+
+---
+
+# Experimental Results
+
+Benchmarking showed:
+- Falcon key generation is slower than BLS
+- Falcon keys and signatures are significantly larger
+- Overall selective disclosure performance remains comparable
+- Bulletproof generation and verification dominate execution time
+- Falcon batch verification performs comparably to BLS aggregate verification in tested scenarios
+
+---
+
+# Project Structure
+
+```text
+src/
+├── createCredential.js
+├── discloseClaims.js
+├── verifyClaims.js
+├── verifyAggregatedClaimsAndSignature.js
+├── falconCli.js
+├── utils.js
+└── ...
+
+scripts/
+├── run-single-flow.sh
+├── run-falcon-flow.sh
+├── run-bls-single-flow.sh
+├── run-bls-flow.sh
+└── benchmark-steps.sh
+
+falcon-rust/
+└── Falcon Rust CLI implementation
+```
+
+---
+
+# Notes
+
+This implementation is a proof-of-concept research project.
+
+The Falcon batch verification mechanism:
+- does not implement true cryptographic aggregation
+- serves as a practical fallback strategy compatible with Falcon signatures
+
+Future work may include:
+- STARK-based aggregation approaches
+- LaBRADOR-style constructions
+- fully post-quantum zero-knowledge proof systems

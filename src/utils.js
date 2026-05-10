@@ -1,3 +1,5 @@
+export const USE_FALCON =
+  process.env.USE_FALCON !== "false";
 
 export function closestPowerOfTwo(n) {
     if (n < 1) return 1;

@@ -1,10 +1,13 @@
 import { MerkleTree}  from 'merkletreejs';
 import loadBls from "bls-signatures";
-import sha256 from 'crypto-js/sha256.js';
+import { createHash } from "crypto";
 import fs  from 'fs';
 import path  from 'path';
 import bulletproofs from '@latticelabs/zkp-js/bulletproof.js'
 import { stringToBigInt } from './utils.js';
+import { USE_FALCON } from "./utils.js";
+import { falconSignRoot } from "./falconCli.js";
+
 const CommitmentUtils = bulletproofs.CommitmentUtils;
 const PedGeneratorParams = bulletproofs.PedGeneratorParams;
 const Rand = bulletproofs.Rand;
@@ -15,6 +18,14 @@ const CompressedBulletproof = bulletproofs.CompressedProofs;
 const ProofFactory = bulletproofs.ProofFactory;
 const pedGenParams = PedGeneratorParams.generateParams(library, curveName);
 const PointFn = pedGenParams.PointFn;
+const sha3_256 = (data) => {
+  const input = Buffer.isBuffer(data)
+    ? data
+    : Buffer.from(String(data));
+
+  return createHash("sha3-256").update(input).digest();
+};
+
 
 
 async function createAndSignCredential(claimsJsonFilePath, privateKeyJsonFilePath) {
@@ -37,7 +48,7 @@ async function createAndSignCredential(claimsJsonFilePath, privateKeyJsonFilePat
   );
 
   // Create the Merkle tree
-  const tree = new MerkleTree(leaves, sha256, { sortPairs: true });
+  const tree = new MerkleTree(leaves, sha3_256, { sortPairs: true });
 
   // Get the Merkle root
   const root = tree.getRoot().toString('hex');
@@ -46,15 +57,20 @@ async function createAndSignCredential(claimsJsonFilePath, privateKeyJsonFilePat
   const privateKeyData = JSON.parse(fs.readFileSync(privateKeyJsonFilePath, 'utf8'));
   const privateKeyHex = privateKeyData.privateKey;
 
-  // Convert the private key back to a BLS PrivateKey object
-  const privateKey = bls.PrivateKey.fromBytes(Buffer.from(privateKeyHex, 'hex'),false);
+  let signatureHex;
 
-  const signature = bls.AugSchemeMPL.sign(privateKey, root);
-  // Sign the root with the private key
-  //const signature = privateKey.sign(Buffer.from(root, 'hex'));
-
-  // Convert the signature to hexadecimal for storage
-  const signatureHex = bls.Util.hex_str(signature.serialize());
+  if (USE_FALCON) {
+    // Falcon signature (root is hex string)
+    signatureHex = falconSignRoot(root, privateKeyHex);
+  } else {
+    // BLS 
+    const privateKey = bls.PrivateKey.fromBytes(
+      Buffer.from(privateKeyHex, 'hex'),
+      false
+    );
+    const signature = bls.AugSchemeMPL.sign(privateKey, root);
+    signatureHex = bls.Util.hex_str(signature.serialize());
+  }
 
   // Prepare the output JSON object
   const output = {

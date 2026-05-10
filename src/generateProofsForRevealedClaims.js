@@ -1,9 +1,9 @@
 import { MerkleTree}  from 'merkletreejs';
-import loadBls from "bls-signatures";
-import sha256 from 'crypto-js/sha256.js';
+import { createHash } from "crypto";
 import fs  from 'fs';
 import bulletproofs from '@latticelabs/zkp-js/bulletproof.js'
 import { closestPowerOfTwo, stringToBigInt } from './utils.js';
+
 const CommitmentUtils = bulletproofs.CommitmentUtils;
 const PedGeneratorParams = bulletproofs.PedGeneratorParams;
 const Rand = bulletproofs.Rand;
@@ -14,6 +14,13 @@ const CompressedBulletproof = bulletproofs.CompressedProofs;
 const ProofFactory = bulletproofs.ProofFactory;
 const pedGenParams = PedGeneratorParams.generateParams(library, curveName);
 const PointFn = pedGenParams.PointFn;
+const sha3_256 = (data) => {
+  const input = Buffer.isBuffer(data)
+    ? data
+    : Buffer.from(String(data));
+
+  return createHash("sha3-256").update(input).digest();
+};
 
 
 function generateProofsForRevealedClaims(claimsJsonFilePath, revealedClaimsFilePath) {
@@ -32,7 +39,7 @@ function generateProofsForRevealedClaims(claimsJsonFilePath, revealedClaimsFileP
     }
   );
   // Create the Merkle tree
-  const tree = new MerkleTree(leaves, sha256, { sortPairs: true });
+  const tree = new MerkleTree(leaves, sha3_256, { sortPairs: true });
   // Generate proofs for the revealed claims
   const proofs = revealedClaims.disclosedClaims?.reduce((acc, claimKey) => {
     const claimValue = claimsData.claims[claimKey];
