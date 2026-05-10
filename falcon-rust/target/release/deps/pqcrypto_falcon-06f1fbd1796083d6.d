@@ -1,0 +1,10 @@
+/Users/matejmarincic/Desktop/Fax/Magistarski/falcon-rust/target/release/deps/pqcrypto_falcon-06f1fbd1796083d6.d: /Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/lib.rs /Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/falcon1024.rs /Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/falcon512.rs /Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/ffi.rs
+
+/Users/matejmarincic/Desktop/Fax/Magistarski/falcon-rust/target/release/deps/libpqcrypto_falcon-06f1fbd1796083d6.rlib: /Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/lib.rs /Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/falcon1024.rs /Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/falcon512.rs /Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/ffi.rs
+
+/Users/matejmarincic/Desktop/Fax/Magistarski/falcon-rust/target/release/deps/libpqcrypto_falcon-06f1fbd1796083d6.rmeta: /Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/lib.rs /Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/falcon1024.rs /Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/falcon512.rs /Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/ffi.rs
+
+/Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/lib.rs:
+/Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/falcon1024.rs:
+/Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/falcon512.rs:
+/Users/matejmarincic/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pqcrypto-falcon-0.3.0/src/ffi.rs:
