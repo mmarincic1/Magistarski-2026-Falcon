@@ -1,0 +1,38 @@
+Mode       Flow       Step                                   Runs   Avg(s)       Min(s)       Max(s)      
+---------------------------------------------------------------------------------------------------------
+BLS        multiple   create_credential_A_and_sign_root      40     0.315996     0.304510     0.373290    
+BLS        multiple   create_credential_B_and_sign_root      40     0.321609     0.299335     0.488951    
+BLS        multiple   create_presentation                    40     0.195934     0.190077     0.216516    
+BLS        multiple   create_required_claims_A               40     0.247944     0.237619     0.305472    
+BLS        multiple   create_required_claims_B               40     0.247956     0.236533     0.287722    
+BLS        multiple   create_selective_disclosure_A          40     6.209109     6.012939     7.704149    
+BLS        multiple   create_selective_disclosure_B          40     0.727093     0.681645     0.970685    
+BLS        multiple   keygen_A                               40     0.203042     0.192013     0.252337    
+BLS        multiple   keygen_B                               40     0.204178     0.190849     0.314733    
+BLS        multiple   verify_multiple                        40     0.330184     0.314463     0.496839    
+BLS        multiple   verify_single_A                        40     4.394799     4.314237     4.523775    
+BLS        multiple   verify_single_B                        40     0.638285     0.608960     0.752638    
+BLS        single     create_credential_and_sign_root        40     0.310976     0.299334     0.376642    
+BLS        single     create_required_claims                 40     0.246238     0.238557     0.272607    
+BLS        single     create_selective_disclosure            40     6.198434     6.014573     7.595777    
+BLS        single     keygen                                 40     0.203273     0.193358     0.312268    
+BLS        single     verify_single                          40     4.416027     4.319785     4.689235    
+Falcon     multiple   create_credential_A_and_sign_root      40     0.313199     0.295159     0.365306    
+Falcon     multiple   create_credential_B_and_sign_root      40     0.306560     0.296659     0.352974    
+Falcon     multiple   create_presentation                    40     0.195589     0.188083     0.244216    
+Falcon     multiple   create_required_claims_A               40     0.246693     0.236904     0.338126    
+Falcon     multiple   create_required_claims_B               40     0.247641     0.237655     0.326556    
+Falcon     multiple   create_selective_disclosure_A          40     6.147078     6.014600     6.354797    
+Falcon     multiple   create_selective_disclosure_B          40     0.709460     0.676654     0.812680    
+Falcon     multiple   keygen_A                               40     0.626153     0.408715     0.790153    
+Falcon     multiple   keygen_B                               40     0.617131     0.413011     0.791489    
+Falcon     multiple   verify_multiple                        40     0.304892     0.291408     0.336382    
+Falcon     multiple   verify_single_A                        40     4.410551     4.312153     4.587897    
+Falcon     multiple   verify_single_B                        40     0.636327     0.603977     0.860962    
+Falcon     single     create_credential_and_sign_root        40     0.306383     0.298562     0.355425    
+Falcon     single     create_required_claims                 40     0.250803     0.240012     0.378289    
+Falcon     single     create_selective_disclosure            40     6.201929     6.003162     7.717130    
+Falcon     single     keygen                                 40     0.629878     0.425942     0.808338    
+Falcon     single     verify_single                          40     4.422899     4.312091     4.925966    
+
+CSV saved to: benchmark-results/step-benchmark-20260512-161927.csv

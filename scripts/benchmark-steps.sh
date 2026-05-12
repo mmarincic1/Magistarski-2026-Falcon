@@ -3,7 +3,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-ITERATIONS="${1:-5}"
+ITERATIONS="${1:-40}"
 RESULTS_DIR="benchmark-results"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 RESULTS_CSV="$RESULTS_DIR/step-benchmark-$STAMP.csv"
