@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 const FALCON_CLI = path.resolve(
   __dirname,
-  "../../falcon-rust/target/release/falcon-cli"
+  "../falcon-rust/target/release/falcon-cli"
 );
 
 export function falconKeygen() {
